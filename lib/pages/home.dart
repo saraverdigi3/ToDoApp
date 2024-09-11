@@ -1,34 +1,36 @@
 import 'package:flutter/cupertino.dart';
 import 'package:to_do_app/model/todoModel.dart';
 import 'package:flutter/material.dart';
-import 'package:to_do_app/constants/colors.dart';
 import 'package:to_do_app/widgets/todo_item.dart';
 
+// Definizione del widget Home come StatefulWidget
 class Home extends StatefulWidget {
   Home({super.key});
 
   @override
-  State<Home> createState() => _HomeState();
+  State<Home> createState() => _HomeState();// Creazione dello stato del widget Home
 }
 
+// Definizione della classe _HomeState che gestisce lo stato del widget Home
 class _HomeState extends State<Home> {
-  final todosList = ToDo.todoList();
-  final _todoController = TextEditingController();
-  List<ToDo> _foundToDo = [];
+  final todosList = ToDo.todoList();// Lista iniziale dei ToDo
+  final _todoController = TextEditingController();// Controller per il campo di testo
+  List<ToDo> _foundToDo = [];// Lista dei ToDo trovati (per la ricerca)
+
 
   @override
   void initState() {
-    // TODO: implement initState
-    _foundToDo = todosList;
-    super.initState();
+    // Metodo chiamato all'inizializzazione del widget
+    _foundToDo = todosList;// Inizializzazione della lista dei ToDo trovati con tutti i ToDo
+    super.initState();// Chiamata al metodo initState della superclasse
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) { // Metodo build per costruire l'interfaccia utente
     return Scaffold(
       backgroundColor: Color(0xFF111111),
       appBar: _buildAppBar(),
-      drawer: _buildDrawer(), // Aggiungi il Drawer qui
+      drawer: _buildDrawer(),
       body: Stack(
         children: [
           Container(
@@ -42,18 +44,18 @@ class _HomeState extends State<Home> {
                       Container(
                         margin: EdgeInsets.only(top: 50, bottom: 20),
                         child: Text(
-                          'All ToDo',
+                          'Things To Do',
                           style: TextStyle(
                               fontWeight: FontWeight.bold,
                               fontSize: 30,
                               color: Color(0xFF7a7a7a)),
                         ),
                       ),
-                      for (ToDo todoo in _foundToDo.reversed)
+                      for (ToDo todoo in _foundToDo.reversed)// Ciclo per ogni ToDo trovato (in ordine inverso)
                         TodoItem(
-                          todo: todoo,
-                          onToDoChanged: _handleToDoChange,
-                          onDeleteItem: _deleteToDoItem,
+                          todo: todoo,// Passaggio del ToDo al widget TodoItem
+                          onToDoChanged: _handleToDoChange,// Callback per il cambiamento dello stato del ToDo
+                          onDeleteItem: _deleteToDoItem,// Callback per l'eliminazione del ToDo
                         ),
                     ],
                   ),
@@ -116,43 +118,48 @@ class _HomeState extends State<Home> {
     );
   }
 
+  // Gestione del cambiamento dello stato del ToDo
+  //si utilizza setState() per notificare il cambio di stato dell'oggetto
   void _handleToDoChange(ToDo todo) {
     setState(() {
-      todo.isDone = !todo.isDone;
+      todo.isDone = !todo.isDone; //se isDone e' true diventa false
     });
   }
 
+  // Eliminazione di un ToDo in base all'id
   void _deleteToDoItem(String id) {
     setState(() {
       todosList.removeWhere((item) => item.id == id);
     });
   }
 
+  // Aggiunta di un nuovo ToDo
   void _addToDoItem(String toDo) {
     setState(() {
       todosList.add(ToDo(
-          id: DateTime
+          id: DateTime  // Generazione di un id unico grazie al timestamp (in microsecondi) che garantisce l'unicita' dell'id
               .now()
               .microsecondsSinceEpoch
               .toString(),
           todoText: toDo));
     });
-    _todoController.clear();
+    _todoController.clear();//resetta il contenuto del controller
   }
 
+  // Filtraggio dei ToDo in base a una parola chiave
   void _runFilter(String enteredKeyword) {
-    List<ToDo> results = [];
-    if (enteredKeyword.isEmpty) {
+    List<ToDo> results = []; //inizializzo nuova lista vuota di tipo ToDo
+    if (enteredKeyword.isEmpty) { //se la parola chiave è vuota viene impostata uguale a todosList e non si usano filtri
       results = todosList;
-    } else {
+    } else { //altrimenti viene filtrata la lista e La condizione verifica se todoText dell'elemento ToDo contiene la parola chiave
       results = todosList
           .where((item) =>
           item.todoText!
               .toLowerCase()
               .contains(enteredKeyword.toLowerCase()))
-          .toList();
+          .toList();//converto i risultati in una lista e li assegno a results
     }
-    setState(() {
+    setState(() {//imposto _foundToDo con i risultati del filtro (results), e aggiorno la lista filtrata visualizzata nella UI.
       _foundToDo = results;
     });
   }
@@ -161,11 +168,14 @@ class _HomeState extends State<Home> {
     return AppBar(
       backgroundColor: Color(0xFF111111),
       elevation: 0,
+    iconTheme: IconThemeData(
+    size: 40, // Imposta la dimensione dell'icona
+    color: Color(0xFF7a7a7a)), // Imposta il colore desiderato
       title: Row(
         children: [
-          SizedBox(width: 80), // Spazio tra l'icona del menu e la search bar
+          SizedBox(width: 150, ), // Spazio tra l'icona del menu e la search bar
           SizedBox(
-            width: 200,
+            width: 150,
             height: 40,
 
             child: Container(
@@ -180,14 +190,13 @@ class _HomeState extends State<Home> {
                   contentPadding: EdgeInsets.all(0),
                   prefixIcon: Icon(
                     Icons.search,
-                    color: tdBlack,
+                    color: Color(0xFF3A3A3A),
                     size: 20,
                   ),
                   prefixIconConstraints: BoxConstraints(
                       maxHeight: 20, minWidth: 25),
                   border: InputBorder.none,
-                  hintText: 'Search',
-                  hintStyle: TextStyle(color: Colors.black87, fontSize: 15),
+
                 ),
               ),
             ),
